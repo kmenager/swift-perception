@@ -36,7 +36,7 @@ jobs:
       - name: List available devices
         run: xcrun simctl list devices available
       - name: Run ${{ matrix.config }} tests
-        run: make XCODEBUILD_ARGUMENT=test CONFIG="${{ matrix.config }}" PLATFORM="${{ matrix.platform }}" SCHEME=swift-perception-Package xcodebuild
+        run: make XCODEBUILD_ARGUMENT="test" CONFIG="${{ matrix.config }}" PLATFORM="${{ matrix.platform }}" SCHEME=swift-perception-Package xcodebuild
       - name: Run compatibility tests
         run: make test-compatibility
         if: ${{ matrix.config == 'debug' }}
