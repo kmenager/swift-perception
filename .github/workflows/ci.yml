@@ -19,14 +19,24 @@ jobs:
     strategy:
       matrix:
         xcode: ['15.4']
-        config: ['debug', 'release']
+        platform: [IOS, MACOS, TVOS, VISIONOS, WATCHOS]
+        config: ['Debug', 'Release']
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode ${{ matrix.xcode }}
         run: sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode }}.app
+      - name: Install visionOS runtime
+        if: matrix.platform == 'visionOS'
+        run: |
+          sudo xcodebuild -runFirstLaunch
+          sudo xcrun simctl list
+          sudo xcodebuild -downloadPlatform visionOS
+          sudo xcodebuild -runFirstLaunch
+      - name: List available devices
+        run: xcrun simctl list devices available
       - name: Run ${{ matrix.config }} tests
-        run: swift test -c ${{ matrix.config }}
+        run: make XCODEBUILD_ARGUMENT=test CONFIG="${{ matrix.config }}" PLATFORM="${{ matrix.platform }}" SCHEME=swift-perception-Package xcodebuild
       - name: Run compatibility tests
         run: make test-compatibility
         if: ${{ matrix.config == 'debug' }}
